@@ -1,4 +1,5 @@
 [![Run tests](https://github.com/mgzip/mgzip/actions/workflows/python-tests.yml/badge.svg)](https://github.com/mgzip/mgzip/actions/workflows/python-tests.yml)
+[![CodeQL](https://github.com/mgzip/mgzip/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mgzip/mgzip/actions/workflows/codeql-analysis.yml)
 
 # mgzip
 A multi-threading implement of Python gzip module
