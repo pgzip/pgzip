@@ -452,6 +452,12 @@ class MultiGzipFile(GzipFile):
             if myfileobj:
                 self.myfileobj = None
                 myfileobj.close()
+                  
+            if self.mode == WRITE:
+                self.pool.close()
+                self.pool.join()
+            elif self.mode == READ:
+                self.raw.close()
 
     def flush(self):
         self._check_not_closed()
