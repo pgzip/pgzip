@@ -1,7 +1,12 @@
+
+<p align="center">
+  <img src="pgzip_logo.png" />
+</p>
+
+# pgzip
 [![Run tests](https://github.com/pgzip/pgzip/actions/workflows/python-tests.yml/badge.svg)](https://github.com/pgzip/pgzip/actions/workflows/python-tests.yml)
 [![CodeQL](https://github.com/pgzip/pgzip/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/pgzip/pgzip/actions/workflows/codeql-analysis.yml)
 
-# pgzip
 A multi-threading implement of Python gzip module
 
 Using a block indexed GZIP file format to enable compress and decompress in parallel. This implement use 'FEXTRA' to record the index of compressed member, which is defined in offical GZIP file format specification version 4.3, so it is fully compatible with normal GZIP implement.
