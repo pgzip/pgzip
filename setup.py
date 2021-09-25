@@ -1,19 +1,19 @@
 from setuptools import setup, find_packages
-from mgzip import __version__
+from pgzip import __version__
 
 with open('README.md') as fh:
-    longDesc = fh.read().replace("CompressionBenchmark.png", "https://raw.githubusercontent.com/vinlyx/mgzip/master/CompressionBenchmark.png").replace("DecompressionBenchmark.png", "https://raw.githubusercontent.com/vinlyx/mgzip/master/DecompressionBenchmark.png")
+    longDesc = fh.read().replace("CompressionBenchmark.png", "https://raw.githubusercontent.com/vinlyx/pgzip/master/CompressionBenchmark.png").replace("DecompressionBenchmark.png", "https://raw.githubusercontent.com/vinlyx/pgzip/master/DecompressionBenchmark.png")
 
 setup(
-    name='mgzip',
+    name='pgzip',
     version=__version__,
-    author='Vincent Li',
-    author_email='vincentliyx@gmail.com',
+    author='pgzip team',
+    author_email='pgzip@thegoldfish.org',
 
     description='A multi-threading implementation of Python gzip module',
     long_description=longDesc,
     long_description_content_type="text/markdown",
-    url='https://github.com/vinlyx/mgzip',
+    url='https://github.com/pgzip/pgzip',
     license='MIT',
     packages=find_packages(),
     classifiers=[

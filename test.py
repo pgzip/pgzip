@@ -1,5 +1,5 @@
-import mgzip
-# import gzip as mgzip
+import pgzip
+# import gzip as pgzip
 import time
 
 def _test():
@@ -22,7 +22,7 @@ def _test():
             # outf = arg + ".dcp"
             outf = "/dev/null"
             fh = open(outf, "wb")
-            gh = mgzip.open(arg, "rb")
+            gh = pgzip.open(arg, "rb")
             t0 = time.time()
             # gh.show_index()
             # data = b"AAA"
@@ -47,7 +47,7 @@ def _test():
         if arg != "-":
             outf = arg + ".gz"
             fh = open(arg, "rb")
-            gh = mgzip.open(outf, "wb", compresslevel=6)
+            gh = pgzip.open(outf, "wb", compresslevel=6)
             data = fh.read()
             t0 = time.time()
             gh.write(data)

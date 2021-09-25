@@ -1,7 +1,7 @@
-[![Run tests](https://github.com/mgzip/mgzip/actions/workflows/python-tests.yml/badge.svg)](https://github.com/mgzip/mgzip/actions/workflows/python-tests.yml)
-[![CodeQL](https://github.com/mgzip/mgzip/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/mgzip/mgzip/actions/workflows/codeql-analysis.yml)
+[![Run tests](https://github.com/pgzip/pgzip/actions/workflows/python-tests.yml/badge.svg)](https://github.com/pgzip/pgzip/actions/workflows/python-tests.yml)
+[![CodeQL](https://github.com/pgzip/pgzip/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/pgzip/pgzip/actions/workflows/codeql-analysis.yml)
 
-# mgzip
+# pgzip
 A multi-threading implement of Python gzip module
 
 Using a block indexed GZIP file format to enable compress and decompress in parallel. This implement use 'FEXTRA' to record the index of compressed member, which is defined in offical GZIP file format specification version 4.3, so it is fully compatible with normal GZIP implement.
@@ -13,17 +13,17 @@ This module is **~25X** faster for compression and **~7X** faster for decompress
 ## Usage
 Use same method as gzip module
 ```python
-import mgzip
+import pgzip
 
 s = "a big string..."
 
 ## Use 8 threads to compress.
 ## None or 0 means using all CPUs (default)
 ## Compression block size is set to 200MB
-with mgzip.open("test.txt.gz", "wt", thread=8, blocksize=2*10**8) as fw:
+with pgzip.open("test.txt.gz", "wt", thread=8, blocksize=2*10**8) as fw:
     fw.write(s)
 
-with mgzip.open("test.txt.gz", "rt", thread=8) as fr:
+with pgzip.open("test.txt.gz", "rt", thread=8) as fr:
     assert fr.read(len(s)) == s
 ```
 
@@ -42,3 +42,10 @@ with mgzip.open("test.txt.gz", "rt", thread=8) as fr:
 **This package only replace the 'GzipFile' class and 'open', 'compress', 'decompress' functions of standard gzip module. It is not well tested for other class and function.**
 
 **As the first release version, some features are not yet supported, such as seek() and tell(). Any contribution or improvement is appreciated.**
+
+## History
+
+This project is a fork of https://github.com/vinlyx/mgzip because we could not
+get in contact with vinlyx and we had bugfixes we wanted implemented. Thankyou
+to Vincent Li (@vinlyx) for all the hard work and if you ever come across this
+then feel free to get in contact.
