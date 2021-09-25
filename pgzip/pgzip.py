@@ -14,7 +14,7 @@ import io
 from gzip import GzipFile, write32u, _GzipReader, _PaddedFile, READ, WRITE, FEXTRA, FNAME, FCOMMENT, FHCRC
 from multiprocessing.dummy import Pool
 
-__version__ = "0.2.1"
+__version__ = "0.3.0"
 
 SID = b'IG' # Subfield ID of indexed gzip file
 
@@ -52,9 +52,9 @@ def open(filename, mode="rb", compresslevel=9,
 
     gz_mode = mode.replace("t", "")
     if isinstance(filename, (str, bytes)):
-        binary_file = MultiGzipFile(filename, gz_mode, compresslevel, thread=thread, blocksize=blocksize)
+        binary_file = PgzipFile(filename, gz_mode, compresslevel, thread=thread, blocksize=blocksize)
     elif hasattr(filename, "read") or hasattr(filename, "write"):
-        binary_file = MultiGzipFile(None, gz_mode, compresslevel, filename, thread=thread, blocksize=blocksize)
+        binary_file = PgzipFile(None, gz_mode, compresslevel, filename, thread=thread, blocksize=blocksize)
     else:
         raise TypeError("filename must be a str or bytes object, or a file")
 
@@ -68,7 +68,7 @@ def compress(data, compresslevel=9, thread=None, blocksize=10**8):
     Optional argument is the compression level, in range of 0-9.
     """
     buf = io.BytesIO()
-    with MultiGzipFile(fileobj=buf, mode='wb', compresslevel=compresslevel,
+    with PgzipFile(fileobj=buf, mode='wb', compresslevel=compresslevel,
                        thread=thread, blocksize=blocksize) as f:
         f.write(data)
     return buf.getvalue()
@@ -77,7 +77,7 @@ def decompress(data, thread=None, blocksize=10**8):
     """Decompress a gzip compressed string in one shot.
     Return the decompressed string.
     """
-    with MultiGzipFile(fileobj=io.BytesIO(data), thread=thread,
+    with PgzipFile(fileobj=io.BytesIO(data), thread=thread,
                        blocksize=blocksize) as f:
         return f.read()
 
@@ -94,8 +94,8 @@ def padded_file_seek(self, off, whence=0):
     return self.file.seek(off, whence)
 _PaddedFile.seek = padded_file_seek # override the seek method to provide whence parameter
 
-class MultiGzipFile(GzipFile):
-    """ docstring of MultiGzipFile """
+class PgzipFile(GzipFile):
+    """ docstring of PgzipFile """
 
     def __init__(self, filename=None, mode=None,
                  compresslevel=9, fileobj=None, mtime=None,
@@ -181,7 +181,7 @@ class MultiGzipFile(GzipFile):
 
     def __repr__(self):
         s = repr(self.fileobj)
-        return '<mgzip ' + s[1:-1] + ' ' + hex(id(self)) + '>'
+        return '<pgzip ' + s[1:-1] + ' ' + hex(id(self)) + '>'
 
     def _write_gzip_header(self):
         ## ignored to write original header
@@ -452,7 +452,7 @@ class MultiGzipFile(GzipFile):
             if myfileobj:
                 self.myfileobj = None
                 myfileobj.close()
-                  
+
             if self.mode == WRITE:
                 self.pool.close()
                 self.pool.join()

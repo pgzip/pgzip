@@ -1,7 +1,7 @@
 import sys
 import os
 import pytest
-import mgzip
+import pgzip
 import gzip
 
 DATA1 = b""""Beautiful is better than ugly.
@@ -14,7 +14,7 @@ Complex is better than complicated.
 def test_write_wb(tmpdir):
 
     filename = os.path.join(tmpdir, "test.gz")
-    with mgzip.open(filename, "wb", compresslevel=6) as f1:
+    with pgzip.open(filename, "wb", compresslevel=6) as f1:
         f1.write(DATA1 * 50)
         # Try flush and fileno.
         f1.flush()
@@ -36,7 +36,7 @@ def test_read_rb(tmpdir):
     with gzip.open(filename, "wb") as f1:
         f1.write(DATA1 * 500)
 
-    with mgzip.open(filename, "rb") as f2:
+    with pgzip.open(filename, "rb") as f2:
         file_content = f2.read()
     assert file_content == DATA1 * 500
 
@@ -44,7 +44,7 @@ def test_read_rb(tmpdir):
 def test_pool_close(tmpdir):
 
     filename = os.path.join(tmpdir, "test.gz")
-    fh = mgzip.open(filename, "wb", compresslevel=6, thread=4, blocksize=128)
+    fh = pgzip.open(filename, "wb", compresslevel=6, thread=4, blocksize=128)
     fh.write(DATA1 * 500)
     if sys.version_info >= (3, 8):
         assert (
