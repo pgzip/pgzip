@@ -133,7 +133,10 @@ class PgzipFile(GzipFile):
 
         """
 
-        self.thread = thread
+        if thread and thread >= 1:
+            self.thread = thread
+        else:
+            self.thread = os.cpu_count() or 1
         self.read_blocks = None
         if mode and ('t' in mode or 'U' in mode):
             raise ValueError("Invalid mode: {!r}".format(mode))
@@ -150,8 +153,7 @@ class PgzipFile(GzipFile):
 
         if mode.startswith('r'):
             self.mode = READ
-            if not self.thread:
-                self.thread = os.cpu_count() // 2 # cores number
+            self.thread = self.thread // 2 or 1
             self.raw = _MulitGzipReader(fileobj, thread=self.thread, max_block_size=blocksize)
             self._buffer = io.BufferedReader(self.raw, blocksize)
             self.name = filename
@@ -159,9 +161,6 @@ class PgzipFile(GzipFile):
 
         elif mode.startswith(('w', 'a', 'x')):
             self.mode = WRITE
-            if not self.thread:
-                # thread is None or 0, use all available CPUs
-                self.thread = os.cpu_count()
             self._init_write(filename)
             self.compress = zlib.compressobj(compresslevel,
                                              zlib.DEFLATED,
