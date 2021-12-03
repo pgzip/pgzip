@@ -14,7 +14,7 @@ from pathlib import Path
 from shutil import copyfileobj
 from traceback import format_exc
 
-from .pgzip import PgzipFile, compress
+from .pgzip import PgzipFile
 
 
 def main():
