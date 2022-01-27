@@ -75,4 +75,4 @@ Contributions or improvements is appreciated for methods such as:
 
 ## History
 
-Created initially by Vincent Li (@vinlyx), this project is a fork of [https://github.com/vinlyx/mgzip](https://github.com/vinlyx/mgzip). We had several bug fixes to implement, but we could not him. The `pgzip` team would like to thank Vincent Li (@vinlyx) for his hard work. We hope that he will contact us when he discovers this project.
+Created initially by Vincent Li (@vinlyx), this project is a fork of [https://github.com/vinlyx/mgzip](https://github.com/vinlyx/mgzip). We had several bug fixes to implement, but we could not contact them. The `pgzip` team would like to thank Vincent Li (@vinlyx) for their hard work. We hope that they will contact us when they discover this project.
