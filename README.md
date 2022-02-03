@@ -67,8 +67,6 @@ with pgzip.open("test.txt.gz", "rt", thread=8) as fr:
     assert fr.read(len(s)) == s
 ```
 
-
-
 ## Performance
 
 ### Compression Performance
