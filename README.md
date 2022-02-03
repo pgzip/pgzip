@@ -17,6 +17,29 @@ Theoretically, the compression and decompression speed should be linear with the
 
 ## Usage and Examples
 
+### CLI
+```
+❯ python -m pgzip -h
+usage: __main__.py [-h] [-o OUTPUT] [-f FILENAME] [-d] [-l {0-9}] [-t THREADS] input
+
+positional arguments:
+  input                 Input file or '-' for stdin
+
+options:
+  -h, --help            show this help message and exit
+  -o OUTPUT, --output OUTPUT
+                        Output file or '-' for stdout (Default: Input file with 'gz' extension or stdout)
+  -f FILENAME, --filename FILENAME
+                        Name for the original file when compressing
+  -d, --decompress      Decompress instead of compress
+  -l {0-9}, --compression-level {0-9}
+                        Compression level; 0 = no compression (Default: 9)
+  -t THREADS, --threads THREADS
+                        Number of threads to use (Default: Determine automatically)
+```
+
+### Programatically
+
 Using `pgzip` is the same as using the built-in `gzip` module.
 
 Compressing data and writing it to a file:
@@ -43,6 +66,8 @@ s = "a big string..."
 with pgzip.open("test.txt.gz", "rt", thread=8) as fr:
     assert fr.read(len(s)) == s
 ```
+
+
 
 ## Performance
 
