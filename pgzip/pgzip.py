@@ -11,21 +11,22 @@ import builtins
 import struct
 import zlib
 import io
-from gzip import (
-    GzipFile,
-    write32u,
-    _GzipReader,
-    _PaddedFile,
-    READ,
-    WRITE,
-    FEXTRA,
-    FNAME,
-    FCOMMENT,
-    FHCRC,
-)
+try:
+    from isal.igzip import (
+        GzipFile,
+        _GzipReader,
+        _PaddedFile,
+    )
+except ImportError:
+    from gzip import (
+        GzipFile,
+        _GzipReader,
+        _PaddedFile,
+    )
+from gzip import write32u, READ, WRITE, FEXTRA, FNAME, FCOMMENT, FHCRC
 from multiprocessing.dummy import Pool
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"
 
 SID = b"IG"  # Subfield ID of indexed gzip file
 
@@ -702,7 +703,7 @@ class _MulitGzipReader(_GzipReader):
             buf = self._fp.read(io.DEFAULT_BUFFER_SIZE)
 
             uncompress = self._decompressor.decompress(buf, size)
-            if self._decompressor.unconsumed_tail != b"":
+            if getattr(self._decompressor, "unconsumed_tail", b"") != b"":
                 self._fp.prepend(self._decompressor.unconsumed_tail)
             elif self._decompressor.unused_data != b"":
                 # Prepend the already read bytes to the fileobj so they can
