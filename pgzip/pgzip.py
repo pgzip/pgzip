@@ -9,15 +9,21 @@ Copyright (c) 2019 Vincent Li
 import os, time
 import builtins
 import struct
-import zlib
 import io
+
+# if present, take advantage of isal:
+#  (intel's "Intelligent Storage Acceleration Library")
+_USING_ISAL_ = False
 try:
+    import isal.isal_zlib as zlib
     from isal.igzip import (
         GzipFile,
         _GzipReader,
         _PaddedFile,
     )
+    _USING_ISAL_ = True
 except ImportError:
+    import zlib
     from gzip import (
         GzipFile,
         _GzipReader,
@@ -193,6 +199,10 @@ class PgzipFile(GzipFile):
                 filename = ""
         if mode is None:
             mode = getattr(fileobj, "mode", "rb")
+
+        if _USING_ISAL_:
+            # map compression levels 0-9 (zlib) => 0-3 (isal_zlib)
+            compresslevel = ( (compresslevel+2) // 3 )
 
         if mode.startswith("r"):
             self.mode = READ
