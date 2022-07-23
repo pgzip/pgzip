@@ -70,7 +70,7 @@ def open(
             raise ValueError("Argument 'newline' not supported in binary mode")
 
     gz_mode = mode.replace("t", "")
-    if isinstance(filename, (str, bytes)):
+    if isinstance(filename, (str, bytes, os.PathLike)):
         binary_file = PgzipFile(
             filename, gz_mode, compresslevel, thread=thread, blocksize=blocksize
         )
