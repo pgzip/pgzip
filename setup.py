@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 from pgzip import __version__
 
 with open('README.md') as fh:
-    longDesc = fh.read().replace("CompressionBenchmark.png", "https://raw.githubusercontent.com/vinlyx/pgzip/master/CompressionBenchmark.png").replace("DecompressionBenchmark.png", "https://raw.githubusercontent.com/vinlyx/pgzip/master/DecompressionBenchmark.png")
+    longDesc = fh.read().replace("CompressionBenchmark.png", "https://raw.githubusercontent.com/pgzip/pgzip/master/CompressionBenchmark.png").replace("DecompressionBenchmark.png", "https://raw.githubusercontent.com/pgzip/pgzip/master/DecompressionBenchmark.png")
 
 setup(
     name='pgzip',
