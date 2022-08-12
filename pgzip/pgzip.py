@@ -23,7 +23,7 @@ from gzip import (
     FCOMMENT,
     FHCRC,
 )
-from multiprocessing.dummy import Pool
+from concurrent.futures import ThreadPoolExecutor
 
 __version__ = "0.3.2"
 
@@ -212,7 +212,7 @@ class PgzipFile(GzipFile):
             self._write_mtime = mtime
             self.compresslevel = compresslevel
             self.blocksize = blocksize  # use 20M blocksize as default
-            self.pool = Pool(self.thread)
+            self.pool = ThreadPoolExecutor(max_workers=self.thread)
             self.pool_result = []
             self.small_buf = io.BytesIO()
         else:
@@ -298,7 +298,7 @@ class PgzipFile(GzipFile):
 
     def _compress_async(self, data, pdata=None):
         return self.pool_result.append(
-            self.pool.apply_async(self._compress_func, args=(data, pdata))
+            self.pool.submit(self._compress_func, data, pdata)
         )
 
     def _compress_block_async(self, data):
@@ -317,7 +317,7 @@ class PgzipFile(GzipFile):
         else:
             flushSize = len(self.pool_result) - self.thread
         for i in range(flushSize):
-            cdata = self.pool_result.pop(0).get()
+            cdata = self.pool_result.pop(0).result()
             length += self._write_member(cdata)
             # (bodyBytes, resBytes, crc, oriSize) = rlt.get()
             # compressRlt = rlt.get()
@@ -515,8 +515,7 @@ class PgzipFile(GzipFile):
                 myfileobj.close()
 
             if self.mode == WRITE:
-                self.pool.close()
-                self.pool.join()
+                self.pool.shutdown(wait=True)
             elif self.mode == READ:
                 self.raw.close()
 
@@ -537,7 +536,7 @@ class _MulitGzipReader(_GzipReader):
         self.max_block_size = max_block_size
         self.thread = thread
         self._read_pool = []
-        self._pool = Pool(self.thread)
+        self._pool = ThreadPoolExecutor(max_workers=self.thread)
         self._block_buff = b""
         self._block_buff_pos = 0
         self._block_buff_size = 0
@@ -570,7 +569,7 @@ class _MulitGzipReader(_GzipReader):
 
     def _decompress_async(self, data, rcrc, rsize):
         self._read_pool.append(
-            self._pool.apply_async(self._decompress_func, args=(data, rcrc, rsize))
+            self._pool.submit(self._decompress_func, data, rcrc, rsize)
         )
 
     def _read_gzip_header(self):
@@ -670,7 +669,7 @@ class _MulitGzipReader(_GzipReader):
                     self._block_buff_pos = self._block_buff_size
                 return self._block_buff[st_pos : self._block_buff_pos]
             elif self._read_pool:
-                block_read_rlt = self._read_pool.pop(0).get()
+                block_read_rlt = self._read_pool.pop(0).result()
                 self.thread += 1
                 # check decompressed data size
                 if len(block_read_rlt[0]) != block_read_rlt[1]:
