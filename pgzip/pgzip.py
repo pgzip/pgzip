@@ -9,20 +9,27 @@ Copyright (c) 2019 Vincent Li
 import os, time
 import builtins
 import struct
-import zlib
 import io
-from gzip import (
-    GzipFile,
-    write32u,
-    _GzipReader,
-    _PaddedFile,
-    READ,
-    WRITE,
-    FEXTRA,
-    FNAME,
-    FCOMMENT,
-    FHCRC,
-)
+
+# if present, take advantage of isal:
+#  (intel's "Intelligent Storage Acceleration Library")
+_USING_ISAL_ = False
+try:
+    import isal.isal_zlib as zlib
+    from isal.igzip import (
+        GzipFile,
+        _GzipReader,
+        _PaddedFile,
+    )
+    _USING_ISAL_ = True
+except ImportError:
+    import zlib
+    from gzip import (
+        GzipFile,
+        _GzipReader,
+        _PaddedFile,
+    )
+from gzip import write32u, READ, WRITE, FEXTRA, FNAME, FCOMMENT, FHCRC
 from multiprocessing.dummy import Pool
 
 __version__ = "0.3.2"
@@ -192,6 +199,10 @@ class PgzipFile(GzipFile):
                 filename = ""
         if mode is None:
             mode = getattr(fileobj, "mode", "rb")
+
+        if _USING_ISAL_:
+            # map compression levels 0-9 (zlib) => 0-3 (isal_zlib)
+            compresslevel = ( (compresslevel+2) // 3 )
 
         if mode.startswith("r"):
             self.mode = READ
@@ -702,7 +713,7 @@ class _MulitGzipReader(_GzipReader):
             buf = self._fp.read(io.DEFAULT_BUFFER_SIZE)
 
             uncompress = self._decompressor.decompress(buf, size)
-            if self._decompressor.unconsumed_tail != b"":
+            if getattr(self._decompressor, "unconsumed_tail", b"") != b"":
                 self._fp.prepend(self._decompressor.unconsumed_tail)
             elif self._decompressor.unused_data != b"":
                 # Prepend the already read bytes to the fileobj so they can
