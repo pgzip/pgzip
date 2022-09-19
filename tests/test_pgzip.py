@@ -46,23 +46,12 @@ def test_pool_close(tmpdir):
     filename = os.path.join(tmpdir, "test.gz")
     fh = pgzip.open(filename, "wb", compresslevel=6, thread=4, blocksize=128)
     fh.write(DATA1 * 500)
-    if sys.version_info >= (3, 8):
-        assert (
-            repr(fh.pool) == "<multiprocessing.pool.ThreadPool state=RUN pool_size=4>"
-        )
+    assert not fh.pool._shutdown
     fh.close()
     assert fh.fileobj is None
     assert fh.myfileobj is None
     assert fh.pool_result == []
-    if sys.version_info >= (3, 8):
-        assert (
-            repr(fh.pool) == "<multiprocessing.pool.ThreadPool state=CLOSE pool_size=4>"
-        )
-    if sys.version_info >= (3, 7):
-        with pytest.raises(ValueError) as excinfo:
-            fh.pool.apply(print, ("x",))
-        assert "Pool not running" in str(excinfo.value)
-    else:
-        with pytest.raises(AssertionError) as excinfo:
-            fh.pool.apply(print, ("x",))
-        assert "" == str(excinfo.value)
+    assert fh.pool._shutdown
+    with pytest.raises(RuntimeError) as excinfo:
+        fh.pool.submit(print, ("x",))
+    assert "cannot schedule new futures after shutdown" == str(excinfo.value)
