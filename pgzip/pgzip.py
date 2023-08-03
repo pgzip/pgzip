@@ -572,6 +572,21 @@ class _MulitGzipReader(_GzipReader):
             self._pool.submit(self._decompress_func, data, rcrc, rsize)
         )
 
+        
+    def _read_exact(self, n):
+        '''Read exactly *n* bytes from `fp`
+        This method is required because fp may be unbuffered,
+        i.e. return short reads.
+        '''
+        data = self._fp.read(n)
+        while len(data) < n:
+            b = self._fp.read(n - len(data))
+            if not b:
+                raise EOFError("Compressed file ended before the "
+                           "end-of-stream marker was reached")
+            data += b
+        return data
+   
     def _read_gzip_header(self):
         magic = self._fp.read(2)
         if magic == b"":
