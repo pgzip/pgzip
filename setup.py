@@ -25,5 +25,5 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Intended Audience :: Developers',
     ],
-    python_requires=">=3.6"
+    python_requires=">=3.7"
 )

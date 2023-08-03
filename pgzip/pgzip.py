@@ -25,7 +25,7 @@ from gzip import (
 )
 from concurrent.futures import ThreadPoolExecutor
 
-__version__ = "0.3.4"
+__version__ = "0.3.5"
 
 SID = b"IG"  # Subfield ID of indexed gzip file
 
