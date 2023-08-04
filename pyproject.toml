@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+license={text = "MIT License"}
+name = 'pgzip'
+requires-python = ">=3.7"
+description = 'A multi-threading implementation of Python gzip module'
+readme = "README.rst"
+authors = [{ name = 'Vincent Li', email = 'vincentliyx@gmail.com' }]
+maintainers = [{ name = 'Tim Hughes', email = 'thughes@thegoldfish.org' }]
+classifiers = [
+  'Development Status :: 4 - Beta',
+  'License :: OSI Approved :: MIT License',
+  'Operating System :: OS Independent',
+  'Programming Language :: Python :: 3',
+  'Programming Language :: Python :: Implementation :: CPython',
+  'Topic :: Software Development :: Libraries :: Python Modules',
+  'Intended Audience :: Developers',
+]
+
+dynamic = ["version"]
+[project.urls]
+Homepage = 'https://github.com/pgzip/pgzip'
+
+[tool.setuptools.dynamic]
+version = { attr = "pgzip.__version__" }
+
+
+[tool.pylint.main]
+ignore-paths = ["tests"]
+
+[tool.isort]
+profile = "black"
+
+[tool.black]
+target-version = ['py311']
+strict = true
+warn_unreachable = true
+pretty = true
+show_column_numbers = true
+show_error_context = true
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

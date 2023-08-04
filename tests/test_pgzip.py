@@ -1,8 +1,10 @@
-import sys
-import os
-import pytest
-import pgzip
 import gzip
+import os
+import sys
+
+import pytest
+
+import pgzip
 
 DATA1 = b""""Beautiful is better than ugly.
 Explicit is better than implicit.
@@ -12,7 +14,6 @@ Complex is better than complicated.
 
 
 def test_write_wb(tmpdir):
-
     filename = os.path.join(tmpdir, "test.gz")
     with pgzip.open(filename, "wb", compresslevel=6) as f1:
         f1.write(DATA1 * 50)
@@ -31,7 +32,6 @@ def test_write_wb(tmpdir):
 
 
 def test_read_rb(tmpdir):
-
     filename = os.path.join(tmpdir, "test.gz")
     with gzip.open(filename, "wb") as f1:
         f1.write(DATA1 * 500)
@@ -42,7 +42,6 @@ def test_read_rb(tmpdir):
 
 
 def test_pool_close(tmpdir):
-
     filename = os.path.join(tmpdir, "test.gz")
     fh = pgzip.open(filename, "wb", compresslevel=6, thread=4, blocksize=128)
     fh.write(DATA1 * 500)

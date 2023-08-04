@@ -18,7 +18,6 @@ from .pgzip import PgzipFile
 
 
 def main():
-
     # Utility function to help open files with context manager
     # Return stdin/stdout if the filename is '-'
     @contextmanager
@@ -29,7 +28,9 @@ def main():
             else:
                 yield sys.stdin.buffer
             return
-        with open(file, mode, *args, **kwargs) as fh:
+        with open(  # pylint: disable=unspecified-encoding
+            file, mode, *args, **kwargs
+        ) as fh:
             yield fh
 
     parser = ArgumentParser()
@@ -37,7 +38,11 @@ def main():
     parser.add_argument(
         "-o",
         "--output",
-        help="Output file or '-' for stdout (Default: Input file with 'gz' extension or stdout)",
+        type=str,
+        help=(
+            "Output file or '-' for stdout (Default: Input file with 'gz'"
+            " extension or stdout)"
+        ),
     )
     parser.add_argument(
         "-f",
@@ -46,7 +51,10 @@ def main():
         help="Name for the original file when compressing",
     )
     parser.add_argument(
-        "-d", "--decompress", action="store_true", help="Decompress instead of compress"
+        "-d",
+        "--decompress",
+        action="store_true",
+        help="Decompress instead of compress",
     )
     parser.add_argument(
         "-l",
@@ -68,8 +76,9 @@ def main():
         "--blocksize",
         type=int,
         help="Block size to use (Default: Determine 100MB)",
-        default=10 ** 8,
+        default=10**8,
     )
+
     args = parser.parse_args()
 
     # Parse name from input file if output file is not specified
@@ -89,7 +98,8 @@ def main():
         try:
             if Path(args.input).samefile(args.output):
                 print(
-                    "Error: Input and output cannot be the same file", file=sys.stderr
+                    "Error: Input and output cannot be the same file",
+                    file=sys.stderr,
                 )
                 sys.exit(1)
         except OSError:

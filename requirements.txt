@@ -1,0 +1,19 @@
+# All dev requirements. pgzip should have no external deps apart from stdlib
+
+pytest
+pytest-cov
+pytest-xdist
+pylint
+
+build
+twine
+
+nox
+mypy
+isort
+black
+pre-commit
+bandit
+flake8
+typeguard
+darglint

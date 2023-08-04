@@ -5,32 +5,36 @@ License: MIT LICENSE
 Copyright (c) 2019 Vincent Li
 
 """
+from __future__ import annotations
 
-import os, time
 import builtins
-import struct
-import zlib
 import io
+import os
+import struct
+import time
+import zlib
+from concurrent.futures import ThreadPoolExecutor
 from gzip import (
-    GzipFile,
-    write32u,
-    _GzipReader,
-    _PaddedFile,
+    FCOMMENT,
+    FEXTRA,
+    FHCRC,
+    FNAME,
     READ,
     WRITE,
-    FEXTRA,
-    FNAME,
-    FCOMMENT,
-    FHCRC,
+    GzipFile,
+    _GzipReader,
+    _PaddedFile,
+    write32u,
 )
-from concurrent.futures import ThreadPoolExecutor
+from io import TextIOWrapper
+from typing import Any
 
 __version__ = "0.3.5"
 
 SID = b"IG"  # Subfield ID of indexed gzip file
 
 
-def open(
+def open(  # pylint: disable=redefined-builtin
     filename,
     mode="rb",
     compresslevel=9,
@@ -38,8 +42,8 @@ def open(
     errors=None,
     newline=None,
     thread=None,
-    blocksize=10 ** 8,
-):
+    blocksize=10**8,
+) -> TextIOWrapper | PgzipFile:
     """Open a gzip-compressed file in binary or text mode.
 
     The filename argument can be an actual filename (a str or bytes object), or
@@ -72,11 +76,20 @@ def open(
     gz_mode = mode.replace("t", "")
     if isinstance(filename, (str, bytes, os.PathLike)):
         binary_file = PgzipFile(
-            filename, gz_mode, compresslevel, thread=thread, blocksize=blocksize
+            filename,
+            gz_mode,
+            compresslevel,
+            thread=thread,
+            blocksize=blocksize,
         )
     elif hasattr(filename, "read") or hasattr(filename, "write"):
         binary_file = PgzipFile(
-            None, gz_mode, compresslevel, filename, thread=thread, blocksize=blocksize
+            None,
+            gz_mode,
+            compresslevel,
+            filename,
+            thread=thread,
+            blocksize=blocksize,
         )
     else:
         raise TypeError("filename must be a str or bytes object, or a file")
@@ -87,7 +100,7 @@ def open(
         return binary_file
 
 
-def compress(data, compresslevel=9, thread=None, blocksize=10 ** 8):
+def compress(data, compresslevel=9, thread=None, blocksize=10**8):
     """Compress data in one shot and return the compressed string.
     Optional argument is the compression level, in range of 0-9.
     """
@@ -103,11 +116,15 @@ def compress(data, compresslevel=9, thread=None, blocksize=10 ** 8):
     return buf.getvalue()
 
 
-def decompress(data, thread=None, blocksize=10 ** 8):
+def decompress(data, thread=None, blocksize=10**8):
     """Decompress a gzip compressed string in one shot.
     Return the decompressed string.
     """
-    with PgzipFile(fileobj=io.BytesIO(data), thread=thread, blocksize=blocksize) as f:
+    with PgzipFile(
+        fileobj=io.BytesIO(data),
+        thread=thread,
+        blocksize=blocksize,
+    ) as f:
         return f.read()
 
 
@@ -119,8 +136,8 @@ def padded_file_seek(self, off, whence=0):
      is stream mode since it is unable to seek
      to the end of stream object.
     """
-    self._read = None
-    self._buffer = None
+    self._read = None  # pylint: disable=protected-access
+    self._buffer = None  # pylint: disable=protected-access
     return self.file.seek(off, whence)
 
 
@@ -132,7 +149,7 @@ _PaddedFile.seek = (
 class PgzipFile(GzipFile):
     """docstring of PgzipFile"""
 
-    def __init__(
+    def __init__(  # pylint: disable=super-init-not-called
         self,
         filename=None,
         mode=None,
@@ -140,8 +157,8 @@ class PgzipFile(GzipFile):
         fileobj=None,
         mtime=None,
         thread=None,
-        blocksize=10 ** 8,
-    ):
+        blocksize=10**8,
+    ) -> None:
         """Constructor for the GzipFile class.
 
         At least one of fileobj and filename must be given a
@@ -172,7 +189,6 @@ class PgzipFile(GzipFile):
         The mtime argument is an optional numeric timestamp to be written
         to the last modification time field in the stream when compressing.
         If omitted or None, the current time is used.
-
         """
 
         if thread and thread >= 1:
@@ -185,7 +201,13 @@ class PgzipFile(GzipFile):
         if mode and "b" not in mode:
             mode += "b"
         if fileobj is None:
-            fileobj = self.myfileobj = builtins.open(filename, mode or "rb", blocksize)
+            fileobj = (
+                self.myfileobj
+            ) = builtins.open(  # pylint: disable=unspecified-encoding
+                filename,
+                mode or "rb",
+                blocksize,
+            )
         if filename is None:
             filename = getattr(fileobj, "name", "")
             if not isinstance(filename, (str, bytes)):
@@ -207,7 +229,11 @@ class PgzipFile(GzipFile):
             self.mode = WRITE
             self._init_write(filename)
             self.compress = zlib.compressobj(
-                compresslevel, zlib.DEFLATED, -zlib.MAX_WBITS, zlib.DEF_MEM_LEVEL, 0
+                compresslevel,
+                zlib.DEFLATED,
+                -zlib.MAX_WBITS,
+                zlib.DEF_MEM_LEVEL,
+                0,
             )
             self._write_mtime = mtime
             self.compresslevel = compresslevel
@@ -224,11 +250,15 @@ class PgzipFile(GzipFile):
         s = repr(self.fileobj)
         return "<pgzip " + s[1:-1] + " " + hex(id(self)) + ">"
 
-    def _write_gzip_header(self):
-        ## ignored to write original header
+    def _write_gzip_header(self) -> None:
+        # ignored to write original header
         pass
 
-    def _compress_func(self, data, pdata=None):
+    def _compress_func(
+        self,
+        data,
+        pdata=None,
+    ):
         """
         Compress data with zlib deflate algorithm.
         Input:
@@ -265,7 +295,7 @@ class PgzipFile(GzipFile):
             crc = zlib.crc32(data)
             return (b"", body_bytes, rest_bytes, crc, data.nbytes)
 
-    def write(self, data):
+    def write(self, data) -> int:
         self._check_not_closed()
         if self.mode != WRITE:
             import errno
@@ -301,7 +331,7 @@ class PgzipFile(GzipFile):
             self.pool.submit(self._compress_func, data, pdata)
         )
 
-    def _compress_block_async(self, data):
+    def _compress_block_async(self, data) -> None:
         if self.small_buf.tell() != 0:
             self._compress_async(data, self.small_buf.getbuffer())
             self.small_buf = io.BytesIO()
@@ -328,7 +358,8 @@ class PgzipFile(GzipFile):
         Write a compressed data as a complete gzip member
         Input:
             cdata:
-                compressed data, a tuple of compressed result returned by _compress_func()
+                compressed data, a tuple of compressed result returned by
+                _compress_func()
         Return:
             size of member
         """
@@ -339,7 +370,10 @@ class PgzipFile(GzipFile):
         self.fileobj.write(cdata[1])  # body data
         self.fileobj.write(cdata[2])  # rest data
         write32u(self.fileobj, cdata[3])  # CRC32
-        write32u(self.fileobj, cdata[4] & 0xFFFFFFFF)  # raw data size in 32bits
+        write32u(  # raw data size in 32bits
+            self.fileobj,
+            cdata[4] & 0xFFFFFFFF,
+        )
         return size
 
     def _write_member_header(self, compressed_size, raw_size):
@@ -478,7 +512,7 @@ class PgzipFile(GzipFile):
                 self.index.append([int(info[1]), int(info[2]), int(info[3]), info[4]])
         return self.index
 
-    def set_read_blocks(self, block_ids):
+    def set_read_blocks(self, block_ids) -> None:
         self.raw.set_block_iter([self.index[x][0] for x in block_ids])
 
     def set_read_blocks_by_name(self, block_names):
@@ -492,7 +526,7 @@ class PgzipFile(GzipFile):
         block_name_set = set(block_names)
         self.raw.set_block_iter([x[0] for x in self.index if x[3] in block_name_set])
 
-    def clear_read_blocks(self):
+    def clear_read_blocks(self) -> None:
         self.raw.clear_block_iter()
 
     def close(self):
@@ -527,7 +561,7 @@ class PgzipFile(GzipFile):
 
 
 class _MulitGzipReader(_GzipReader):
-    def __init__(self, fp, thread=4, max_block_size=5 * 10 ** 8):
+    def __init__(self, fp, thread=4, max_block_size=5 * 10**8) -> None:
         super().__init__(fp)
 
         self.memberidx = []  # list of tuple (memberSize, rawTxtSize)
@@ -567,27 +601,28 @@ class _MulitGzipReader(_GzipReader):
             crc = zlib.crc32(dpr.unconsumed_tail, crc)
         return (body_bytes, rsize, crc, rcrc)
 
-    def _decompress_async(self, data, rcrc, rsize):
+    def _decompress_async(self, data, rcrc, rsize) -> None:
         self._read_pool.append(
             self._pool.submit(self._decompress_func, data, rcrc, rsize)
         )
 
-        
     def _read_exact(self, n):
-        '''Read exactly *n* bytes from `fp`
+        """Read exactly *n* bytes from `fp`
         This method is required because fp may be unbuffered,
         i.e. return short reads.
-        '''
+        """
         data = self._fp.read(n)
         while len(data) < n:
             b = self._fp.read(n - len(data))
             if not b:
-                raise EOFError("Compressed file ended before the "
-                           "end-of-stream marker was reached")
+                raise EOFError(
+                    "Compressed file ended before the "
+                    "end-of-stream marker was reached"
+                )
             data += b
         return data
-   
-    def _read_gzip_header(self):
+
+    def _read_gzip_header(self) -> bool:
         magic = self._fp.read(2)
         if magic == b"":
             return False
@@ -735,7 +770,7 @@ class _MulitGzipReader(_GzipReader):
         self._pos += len(uncompress)
         return uncompress
 
-    def _read_eof_crc(self):
+    def _read_eof_crc(self) -> tuple[Any, Any]:
         """
         Get crc32 and isize without checking
         """
@@ -751,8 +786,8 @@ class _MulitGzipReader(_GzipReader):
             self._fp.prepend(c)
         return (crc32, isize)
 
-    def set_block_iter(self, block_start_list):
+    def set_block_iter(self, block_start_list) -> None:
         self.block_start_iter = iter(block_start_list)
 
-    def clear_block_iter(self):
+    def clear_block_iter(self) -> None:
         self.block_start_iter = None
