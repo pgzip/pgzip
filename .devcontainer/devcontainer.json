@@ -14,9 +14,6 @@
 		"ghcr.io/devcontainers-contrib/features/isort:2": {
 			"version": "latest"
 		},
-		"ghcr.io/devcontainers-contrib/features/poetry:2": {
-			"version": "latest"
-		},
 		"ghcr.io/devcontainers-contrib/features/pre-commit:2": {
 			"version": "latest"
 		},
