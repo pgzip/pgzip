@@ -6,7 +6,7 @@ Copyright (c) 2019 Vincent Li
 
 """
 
-from .pgzip import PgzipFile, open, compress, decompress, __version__
+from .pgzip import PgzipFile, __version__, compress, decompress, open
 
 __all__ = ["GzipFile", "open", "compress", "decompress"]
 

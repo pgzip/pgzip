@@ -6,24 +6,25 @@ Copyright (c) 2019 Vincent Li
 
 """
 
-import os, time
 import builtins
-import struct
-import zlib
 import io
+import os
+import struct
+import time
+import zlib
+from concurrent.futures import ThreadPoolExecutor
 from gzip import (
-    GzipFile,
-    write32u,
-    _GzipReader,
-    _PaddedFile,
+    FCOMMENT,
+    FEXTRA,
+    FHCRC,
+    FNAME,
     READ,
     WRITE,
-    FEXTRA,
-    FNAME,
-    FCOMMENT,
-    FHCRC,
+    GzipFile,
+    _GzipReader,
+    _PaddedFile,
+    write32u,
 )
-from concurrent.futures import ThreadPoolExecutor
 
 __version__ = "0.3.5"
 
@@ -38,7 +39,7 @@ def open(
     errors=None,
     newline=None,
     thread=None,
-    blocksize=10 ** 8,
+    blocksize=10**8,
 ):
     """Open a gzip-compressed file in binary or text mode.
 
@@ -60,7 +61,7 @@ def open(
     """
     if "t" in mode:
         if "b" in mode:
-            raise ValueError("Invalid mode: %r" % (mode,))
+            raise ValueError(f"Invalid mode: {mode!r}")
     else:
         if encoding is not None:
             raise ValueError("Argument 'encoding' not supported in binary mode")
@@ -87,7 +88,7 @@ def open(
         return binary_file
 
 
-def compress(data, compresslevel=9, thread=None, blocksize=10 ** 8):
+def compress(data, compresslevel=9, thread=None, blocksize=10**8):
     """Compress data in one shot and return the compressed string.
     Optional argument is the compression level, in range of 0-9.
     """
@@ -103,7 +104,7 @@ def compress(data, compresslevel=9, thread=None, blocksize=10 ** 8):
     return buf.getvalue()
 
 
-def decompress(data, thread=None, blocksize=10 ** 8):
+def decompress(data, thread=None, blocksize=10**8):
     """Decompress a gzip compressed string in one shot.
     Return the decompressed string.
     """
@@ -140,7 +141,7 @@ class PgzipFile(GzipFile):
         fileobj=None,
         mtime=None,
         thread=None,
-        blocksize=10 ** 8,
+        blocksize=10**8,
     ):
         """Constructor for the GzipFile class.
 
@@ -181,7 +182,7 @@ class PgzipFile(GzipFile):
             self.thread = os.cpu_count() or 1
         self.read_blocks = None
         if mode and ("t" in mode or "U" in mode):
-            raise ValueError("Invalid mode: {!r}".format(mode))
+            raise ValueError(f"Invalid mode: {mode!r}")
         if mode and "b" not in mode:
             mode += "b"
         if fileobj is None:
@@ -216,7 +217,7 @@ class PgzipFile(GzipFile):
             self.pool_result = []
             self.small_buf = io.BytesIO()
         else:
-            raise ValueError("Invalid mode: {!r}".format(mode))
+            raise ValueError(f"Invalid mode: {mode!r}")
 
         self.fileobj = fileobj
 
@@ -527,7 +528,7 @@ class PgzipFile(GzipFile):
 
 
 class _MulitGzipReader(_GzipReader):
-    def __init__(self, fp, thread=4, max_block_size=5 * 10 ** 8):
+    def __init__(self, fp, thread=4, max_block_size=5 * 10**8):
         super().__init__(fp)
 
         self.memberidx = []  # list of tuple (memberSize, rawTxtSize)
@@ -572,21 +573,22 @@ class _MulitGzipReader(_GzipReader):
             self._pool.submit(self._decompress_func, data, rcrc, rsize)
         )
 
-        
     def _read_exact(self, n):
-        '''Read exactly *n* bytes from `fp`
+        """Read exactly *n* bytes from `fp`
         This method is required because fp may be unbuffered,
         i.e. return short reads.
-        '''
+        """
         data = self._fp.read(n)
         while len(data) < n:
             b = self._fp.read(n - len(data))
             if not b:
-                raise EOFError("Compressed file ended before the "
-                           "end-of-stream marker was reached")
+                raise EOFError(
+                    "Compressed file ended before the "
+                    "end-of-stream marker was reached"
+                )
             data += b
         return data
-   
+
     def _read_gzip_header(self):
         magic = self._fp.read(2)
         if magic == b"":

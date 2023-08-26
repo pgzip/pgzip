@@ -61,6 +61,7 @@ show_error_context = true
 
 [tool.bandit]
 targets=["pgzip"]
+skips = ["B101"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]

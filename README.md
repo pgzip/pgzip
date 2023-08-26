@@ -18,6 +18,7 @@ Theoretically, the compression and decompression speed should be linear with the
 ## Usage and Examples
 
 ### CLI
+
 ```
 ❯ python -m pgzip -h
 usage: __main__.py [-h] [-o OUTPUT] [-f FILENAME] [-d] [-l {0-9}] [-t THREADS] input

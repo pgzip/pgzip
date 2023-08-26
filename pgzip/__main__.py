@@ -18,7 +18,6 @@ from .pgzip import PgzipFile
 
 
 def main():
-
     # Utility function to help open files with context manager
     # Return stdin/stdout if the filename is '-'
     @contextmanager
@@ -68,7 +67,7 @@ def main():
         "--blocksize",
         type=int,
         help="Block size to use (Default: Determine 100MB)",
-        default=10 ** 8,
+        default=10**8,
     )
     args = parser.parse_args()
 
