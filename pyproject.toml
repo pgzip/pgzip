@@ -2,7 +2,6 @@
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
-
 [project]
 license={text = "MIT License"}
 name = 'pgzip'
@@ -20,14 +19,26 @@ classifiers = [
   'Topic :: Software Development :: Libraries :: Python Modules',
   'Intended Audience :: Developers',
 ]
-
 dynamic = ["version"]
+
 [project.urls]
 Homepage = 'https://github.com/pgzip/pgzip'
 
+[project.optional-dependencies]
+dev = [
+    "black",
+    "build",
+    "flake8",
+    "isort",
+    "pylint",
+    "pytest-cov",
+    "pytest-xdist",
+    "pytest",
+    "twine",
+]
+
 [tool.setuptools.dynamic]
 version = { attr = "pgzip.__version__" }
-
 
 [tool.pylint.main]
 ignore-paths = ["tests"]
