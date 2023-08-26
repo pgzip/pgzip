@@ -5,22 +5,6 @@
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/python:1-3-bookworm",
 	"features": {
-		"ghcr.io/devcontainers-contrib/features/bandit:2": {
-			"version": "latest"
-		},
-		"ghcr.io/devcontainers-contrib/features/black:2": {
-			"version": "latest"
-		},
-		"ghcr.io/devcontainers-contrib/features/isort:2": {
-			"version": "latest"
-		},
-		"ghcr.io/devcontainers-contrib/features/pre-commit:2": {
-			"version": "latest"
-		},
-		"ghcr.io/devcontainers-contrib/features/ruff:1": {
-			"version": "latest"
-		}
-
 	},
 	"customizations": {
 		"vscode": {
@@ -37,7 +21,9 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "pip3 install --user -r requirements-dev.txt"
+	"postCreateCommand": {
+		"pip_install":"pip install  --editable .[dev]"
+	}
 
 	// Configure tool-specific properties.
 	// "customizations": {},
