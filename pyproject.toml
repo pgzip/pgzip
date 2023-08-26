@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -35,6 +35,11 @@ dev = [
     "pytest-xdist",
     "pytest",
     "twine",
+    "nox",
+    "pre-commit",
+    "pre-commit-hooks",
+    "bandit",
+    "pyupgrade",
 ]
 
 [tool.setuptools.dynamic]
@@ -53,6 +58,9 @@ warn_unreachable = true
 pretty = true
 show_column_numbers = true
 show_error_context = true
+
+[tool.bandit]
+targets=["pgzip"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
