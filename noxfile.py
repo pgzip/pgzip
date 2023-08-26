@@ -25,6 +25,7 @@ if os.environ.get("CI", None):
     ]
 )
 def test(session: nox.Session) -> None:
+    session.install("pytest")
     session.install(".")
     session.run("pytest")
 
