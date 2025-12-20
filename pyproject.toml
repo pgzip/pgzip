@@ -42,6 +42,9 @@ dev = [
     "pyupgrade",
 ]
 
+[tool.setuptools]
+packages = ["pgzip"]
+
 [tool.setuptools.dynamic]
 version = { attr = "pgzip.__version__" }
 
@@ -52,12 +55,7 @@ ignore-paths = ["tests"]
 profile = "black"
 
 [tool.black]
-target-version = ['py311']
-strict = true
-warn_unreachable = true
-pretty = true
-show_column_numbers = true
-show_error_context = true
+target-version = ['py313']
 
 [tool.bandit]
 targets=["pgzip"]
