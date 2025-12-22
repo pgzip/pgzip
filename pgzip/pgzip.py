@@ -216,6 +216,9 @@ class PgzipFile(GzipFile):
             self.pool = ThreadPoolExecutor(max_workers=self.thread)
             self.pool_result = []
             self.small_buf = io.BytesIO()
+            # Add _buffer attribute for Python 3.12+ compatibility with io.TextIOWrapper
+            self._buffer = self
+            self._buffer_size = 32768  # Match standard gzip module
         else:
             raise ValueError(f"Invalid mode: {mode!r}")
 
@@ -718,12 +721,20 @@ class _MulitGzipReader(_GzipReader):
             buf = self._fp.read(io.DEFAULT_BUFFER_SIZE)
 
             uncompress = self._decompressor.decompress(buf, size)
-            if self._decompressor.unconsumed_tail != b"":
-                self._fp.prepend(self._decompressor.unconsumed_tail)
-            elif self._decompressor.unused_data != b"":
-                # Prepend the already read bytes to the fileobj so they can
-                # be seen by _read_eof() and _read_gzip_header()
-                self._fp.prepend(self._decompressor.unused_data)
+            # Handle Python 3.12+ compatibility where unconsumed_tail was removed
+            if hasattr(self._decompressor, "unconsumed_tail"):
+                if self._decompressor.unconsumed_tail != b"":
+                    self._fp.prepend(self._decompressor.unconsumed_tail)
+                elif self._decompressor.unused_data != b"":
+                    # Prepend the already read bytes to the fileobj so they can
+                    # be seen by _read_eof() and _read_gzip_header()
+                    self._fp.prepend(self._decompressor.unused_data)
+            else:
+                # Python 3.12+ - unconsumed_tail was removed, only check unused_data
+                if self._decompressor.unused_data != b"":
+                    # Prepend the already read bytes to the fileobj so they can
+                    # be seen by _read_eof() and _read_gzip_header()
+                    self._fp.prepend(self._decompressor.unused_data)
 
             if uncompress != b"":
                 break
@@ -733,7 +744,13 @@ class _MulitGzipReader(_GzipReader):
                     "end-of-stream marker was reached"
                 )
 
-        self._add_read_data(uncompress)
+        # Handle Python 3.12+ compatibility where _add_read_data was removed
+        if hasattr(self, "_add_read_data"):
+            self._add_read_data(uncompress)
+        else:
+            # Python 3.12+ - manually update CRC and stream size
+            self._crc = zlib.crc32(uncompress, self._crc)
+            self._stream_size = self._stream_size + len(uncompress)
         self._pos += len(uncompress)
         return uncompress
 
