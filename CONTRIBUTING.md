@@ -36,7 +36,7 @@ hatch run test
 # Run tests with coverage
 hatch run cov
 
-# Test all Python versions (3.10-3.13)
+# Test all Python versions (3.10-3.14)
 hatch run all:test
 
 # Test specific Python version
@@ -44,6 +44,7 @@ hatch run all.py3.10:test
 hatch run all.py3.11:test
 hatch run all.py3.12:test
 hatch run all.py3.13:test
+hatch run all.py3.14:test
 ```
 
 ### Code Quality

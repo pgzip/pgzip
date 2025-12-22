@@ -56,7 +56,7 @@ check = ["black --check --diff {args:.}", "isort --check-only --diff {args:.}"]
 fix = ["black {args:.}", "isort {args:.}"]
 
 [[tool.hatch.envs.all.matrix]]
-python = ["3.10", "3.11", "3.12", "3.13"]
+python = ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
 [tool.hatch.envs.all]
 installer = "uv"
