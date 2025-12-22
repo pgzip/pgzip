@@ -34,6 +34,7 @@ def lint(session: nox.Session) -> None:
     Run the linter.
     """
     session.install("pre-commit")
+    session.install("black", "isort", "bandit", "pre-commit-hooks")
     session.run("pre-commit", "run", "--all-files", *session.posargs)
 
 
