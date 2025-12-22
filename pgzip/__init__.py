@@ -8,6 +8,6 @@ Copyright (c) 2019 Vincent Li
 
 from .pgzip import PgzipFile, __version__, compress, decompress, open
 
-__all__ = ["GzipFile", "open", "compress", "decompress"]
+__all__ = ["GzipFile", "compress", "decompress", "open"]
 
 GzipFile = PgzipFile

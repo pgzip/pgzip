@@ -1,52 +1,64 @@
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
-license={text = "MIT License"}
+license = { text = "MIT License" }
 name = 'pgzip'
-requires-python = ">=3.7"
+requires-python = ">=3.10"
 description = 'A multi-threading implementation of Python gzip module'
 readme = "README.md"
-authors = [{ name = 'Vincent Li', email = 'vincentliyx@gmail.com' }]
+authors = [
+    { name = 'Vincent Li', email = 'vincentliyx@gmail.com' },
+    { name = 'Tim Hughes', email = 'thughes@thegoldfish.org' },
+]
 maintainers = [{ name = 'Tim Hughes', email = 'thughes@thegoldfish.org' }]
 classifiers = [
-  'Development Status :: 4 - Beta',
-  'License :: OSI Approved :: MIT License',
-  'Operating System :: OS Independent',
-  'Programming Language :: Python :: 3',
-  'Programming Language :: Python :: Implementation :: CPython',
-  'Topic :: Software Development :: Libraries :: Python Modules',
-  'Intended Audience :: Developers',
+    'Development Status :: 4 - Beta',
+    'License :: OSI Approved :: MIT License',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: Implementation :: CPython',
+    'Topic :: Software Development :: Libraries :: Python Modules',
+    'Intended Audience :: Developers',
 ]
 dynamic = ["version"]
+
+[tool.hatch.version]
+path = "pgzip/pgzip.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["pgzip"]
 
 [project.urls]
 Homepage = 'https://github.com/pgzip/pgzip'
 
-[project.optional-dependencies]
-dev = [
-    "black",
-    "build",
-    "flake8",
-    "isort",
-    "pylint",
-    "pytest-cov",
-    "pytest-xdist",
-    "pytest",
-    "twine",
-    "nox",
-    "pre-commit",
-    "pre-commit-hooks",
-    "bandit",
-    "pyupgrade",
-]
+[tool.hatch.envs.default]
+installer = "uv"
+dependencies = ["pytest", "pytest-cov", "pytest-xdist"]
 
-[tool.setuptools]
-packages = ["pgzip"]
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=pgzip --cov=tests {args:tests}"
 
-[tool.setuptools.dynamic]
-version = { attr = "pgzip.__version__" }
+[tool.hatch.envs.lint]
+installer = "uv"
+detached = true
+dependencies = ["black", "isort", "bandit", "pre-commit", "pre-commit-hooks"]
+
+[tool.hatch.envs.lint.scripts]
+check = ["black --check --diff {args:.}", "isort --check-only --diff {args:.}"]
+fix = ["black {args:.}", "isort {args:.}"]
+
+[[tool.hatch.envs.all.matrix]]
+python = ["3.10", "3.11", "3.12", "3.13"]
+
+[tool.hatch.envs.all]
+installer = "uv"
+dependencies = ["pytest", "pytest-cov", "pytest-xdist"]
+
+[tool.hatch.envs.all.scripts]
+test = "pytest {args:tests}"
 
 [tool.pylint.main]
 ignore-paths = ["tests"]
@@ -58,7 +70,7 @@ profile = "black"
 target-version = ['py313']
 
 [tool.bandit]
-targets=["pgzip"]
+targets = ["pgzip"]
 skips = ["B101"]
 
 [tool.pytest.ini_options]

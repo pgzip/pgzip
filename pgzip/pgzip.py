@@ -84,8 +84,7 @@ def open(
 
     if "t" in mode:
         return io.TextIOWrapper(binary_file, encoding, errors, newline)
-    else:
-        return binary_file
+    return binary_file
 
 
 def compress(data, compresslevel=9, thread=None, blocksize=10**8):
@@ -265,9 +264,8 @@ class PgzipFile(GzipFile):
                 crc,
                 pdata.nbytes + data.nbytes,
             )
-        else:
-            crc = zlib.crc32(data)
-            return (b"", body_bytes, rest_bytes, crc, data.nbytes)
+        crc = zlib.crc32(data)
+        return (b"", body_bytes, rest_bytes, crc, data.nbytes)
 
     def write(self, data):
         self._check_not_closed()
@@ -284,7 +282,7 @@ class PgzipFile(GzipFile):
 
         if length == 0:
             return length
-        elif length >= self.blocksize:
+        if length >= self.blocksize:
             if length < 2 * self.blocksize:
                 # use sigle thread
                 self._compress_block_async(data)
@@ -474,7 +472,7 @@ class PgzipFile(GzipFile):
 
     def load_index(self, idx_file):
         self.index = []
-        with builtins.open(idx_file, "r") as fh:
+        with builtins.open(idx_file) as fh:
             for line in fh:
                 info = line.split()
                 if not info or info[0].startswith("#"):
@@ -685,10 +683,9 @@ class _MulitGzipReader(_GzipReader):
             if self._block_buff_pos + size <= self._block_buff_size:
                 st_pos = self._block_buff_pos
                 self._block_buff_pos += size
-                if self._block_buff_pos >= self._block_buff_size:
-                    self._block_buff_pos = self._block_buff_size
+                self._block_buff_pos = min(self._block_buff_size, self._block_buff_pos)
                 return self._block_buff[st_pos : self._block_buff_pos]
-            elif self._read_pool:
+            if self._read_pool:
                 block_read_rlt = self._read_pool.pop(0).result()
                 self.thread += 1
                 # check decompressed data size
@@ -697,9 +694,7 @@ class _MulitGzipReader(_GzipReader):
                 # check raw crc32 == decompressed crc32
                 if block_read_rlt[2] != block_read_rlt[3]:
                     raise OSError(
-                        "CRC check failed {:s} != {:s}".format(
-                            block_read_rlt[3], block_read_rlt[2]
-                        )
+                        f"CRC check failed {block_read_rlt[3]:s} != {block_read_rlt[2]:s}"
                     )
                 self._block_buff = (
                     self._block_buff[self._block_buff_pos :] + block_read_rlt[0]
@@ -709,12 +704,12 @@ class _MulitGzipReader(_GzipReader):
                 return self._block_buff[
                     :size
                 ]  # FIXME: fix issue when size > len(self._block_buff)
-            elif self._block_buff_pos != self._block_buff_size:
+            if self._block_buff_pos != self._block_buff_size:
                 # still something in self._block_buff
                 st_pos = self._block_buff_pos
                 self._block_buff_pos = self._block_buff_size
                 return self._block_buff[st_pos:]
-            elif self._is_eof:
+            if self._is_eof:
                 return b""
 
             # Read a chunk of data from the file
@@ -729,12 +724,11 @@ class _MulitGzipReader(_GzipReader):
                     # Prepend the already read bytes to the fileobj so they can
                     # be seen by _read_eof() and _read_gzip_header()
                     self._fp.prepend(self._decompressor.unused_data)
-            else:
-                # Python 3.12+ - unconsumed_tail was removed, only check unused_data
-                if self._decompressor.unused_data != b"":
-                    # Prepend the already read bytes to the fileobj so they can
-                    # be seen by _read_eof() and _read_gzip_header()
-                    self._fp.prepend(self._decompressor.unused_data)
+            # Python 3.12+ - unconsumed_tail was removed, only check unused_data
+            elif self._decompressor.unused_data != b"":
+                # Prepend the already read bytes to the fileobj so they can
+                # be seen by _read_eof() and _read_gzip_header()
+                self._fp.prepend(self._decompressor.unused_data)
 
             if uncompress != b"":
                 break

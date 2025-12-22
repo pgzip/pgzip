@@ -24,11 +24,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install nox
-      - name: Test with nox
+          pip install hatch
+      - name: Test with hatch
         run: |
-          nox -s test-${{ matrix.python-version }}
-      - name: Lint with nox
+          hatch run test
+      - name: Lint with hatch
         if: matrix.python-version == '3.13'
         run: |
-          nox -s lint
+          hatch run lint:check

@@ -1,6 +1,5 @@
 import gzip
 import os
-import sys
 
 import pytest
 
@@ -71,7 +70,7 @@ def test_pool_close(tmpdir):
     assert fh.pool._shutdown
     with pytest.raises(RuntimeError) as excinfo:
         fh.pool.submit(print, ("x",))
-    assert "cannot schedule new futures after shutdown" == str(excinfo.value)
+    assert str(excinfo.value) == "cannot schedule new futures after shutdown"
 
 
 def test_compress_function():

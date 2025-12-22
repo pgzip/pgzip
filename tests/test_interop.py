@@ -2,7 +2,6 @@
 
 import array
 import gzip
-import io
 
 import pytest
 
@@ -198,7 +197,6 @@ class TestPgzipGzipCompatibility:
         with pgzip.open(temp_file, "wb") as f:
             f.write(DATA1)
 
-        with pgzip.open(temp_file, mode) as pf:
-            with gzip.open(temp_file, mode) as gf:
-                # Both should have same mode values
-                assert pf.mode == gf.mode
+        with pgzip.open(temp_file, mode) as pf, gzip.open(temp_file, mode) as gf:
+            # Both should have same mode values
+            assert pf.mode == gf.mode

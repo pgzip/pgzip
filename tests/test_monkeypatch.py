@@ -2,10 +2,7 @@
 
 import gzip
 import os
-import sys
 import tempfile
-import unittest
-from unittest.mock import patch
 
 import pytest
 

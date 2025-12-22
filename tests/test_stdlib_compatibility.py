@@ -1,13 +1,9 @@
 """Test pgzip compatibility with stdlib gzip using adapted stdlib tests."""
 
 import array
-import functools
-import gc
 import gzip
 import io
 import os
-import struct
-import sys
 import tempfile
 import unittest
 

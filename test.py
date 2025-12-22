@@ -46,29 +46,24 @@ def _test():
             speed = size / seconds
             nsize = os.stat(arg).st_size
             print(
-                "Decompressed {:.2f} MB data in {:.2f} S, Speed: {:.2f} MB/s, Rate: {:.2f} %".format(
-                    size, seconds, speed, nsize / tsize * 100
-                )
+                f"Decompressed {size:.2f} MB data in {seconds:.2f} S, Speed: {speed:.2f} MB/s, Rate: {nsize / tsize * 100:.2f} %"
             )
-    else:
-        if arg != "-":
-            outf = arg + ".gz"
-            fh = open(arg, "rb")
-            gh = pgzip.open(outf, "wb", compresslevel=6)
-            data = fh.read()
-            t0 = time.time()
-            gh.write(data)
-            gh.close()
-            t1 = time.time()
-            size = len(data) / (1024**2)
-            seconds = t1 - t0
-            speed = size / seconds
-            nsize = os.stat(outf).st_size
-            print(
-                "Compressed {:.2f} MB data in {:.2f} S, Speed: {:.2f} MB/s, Rate: {:.2f} %".format(
-                    size, seconds, speed, nsize / len(data) * 100
-                )
-            )
+    elif arg != "-":
+        outf = arg + ".gz"
+        fh = open(arg, "rb")
+        gh = pgzip.open(outf, "wb", compresslevel=6)
+        data = fh.read()
+        t0 = time.time()
+        gh.write(data)
+        gh.close()
+        t1 = time.time()
+        size = len(data) / (1024**2)
+        seconds = t1 - t0
+        speed = size / seconds
+        nsize = os.stat(outf).st_size
+        print(
+            f"Compressed {size:.2f} MB data in {seconds:.2f} S, Speed: {speed:.2f} MB/s, Rate: {nsize / len(data) * 100:.2f} %"
+        )
 
 
 if __name__ == "__main__":
