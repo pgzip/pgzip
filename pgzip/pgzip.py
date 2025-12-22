@@ -584,8 +584,7 @@ class _MulitGzipReader(_GzipReader):
             b = self._fp.read(n - len(data))
             if not b:
                 raise EOFError(
-                    "Compressed file ended before the "
-                    "end-of-stream marker was reached"
+                    "Compressed file ended before the end-of-stream marker was reached"
                 )
             data += b
         return data
@@ -734,8 +733,7 @@ class _MulitGzipReader(_GzipReader):
                 break
             if buf == b"":
                 raise EOFError(
-                    "Compressed file ended before the "
-                    "end-of-stream marker was reached"
+                    "Compressed file ended before the end-of-stream marker was reached"
                 )
 
         # Handle Python 3.12+ compatibility where _add_read_data was removed

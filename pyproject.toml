@@ -40,6 +40,11 @@ dependencies = ["pytest", "pytest-cov", "pytest-xdist"]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=pgzip --cov=tests {args:tests}"
+release = [
+  "hatch run all:test",
+  "hatch run lint:check",
+  "hatch build",
+]
 
 [tool.hatch.envs.lint]
 installer = "uv"
@@ -68,6 +73,10 @@ profile = "black"
 
 [tool.black]
 target-version = ['py313']
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
 
 [tool.bandit]
 targets = ["pgzip"]

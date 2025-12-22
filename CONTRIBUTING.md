@@ -63,14 +63,20 @@ hatch run lint:fix
 hatch build
 ```
 
+### Release
+
+```bash
+# Full release check (test all versions + lint + build)
+hatch run release
+```
+
 ## Making Changes
 
 1. **Fork** the repository
 2. **Create a branch** for your changes
 3. **Make your changes** with tests
-4. **Run the test suite** (`hatch run all:test`)
-5. **Run linting** (`hatch run lint:check`)
-6. **Submit a pull request**
+4. **Run the full test suite** (`hatch run release`)
+5. **Submit a pull request**
 
 ## Code Style
 
