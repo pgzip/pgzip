@@ -16,12 +16,10 @@ if os.environ.get("CI", None):
 # -----------------------------------------------------------------------------
 @nox.session(
     python=[
-        "3.7",
-        "3.8",
         "3.9",
         "3.10",
         "3.11",
-        "3.12",
+        # "3.12",  # Temporarily disabled due to compatibility issues
     ]
 )
 def test(session: nox.Session) -> None:

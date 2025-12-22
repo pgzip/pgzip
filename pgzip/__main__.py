@@ -6,7 +6,6 @@ Copyright (c) 2019 Vincent Li
 
 """
 
-
 import sys
 from argparse import ArgumentParser
 from contextlib import contextmanager
@@ -101,9 +100,10 @@ def main():
             args.filename = Path(args.output).name
 
     try:
-        with smart_open(args.input, "rb") as in_fh, smart_open(
-            args.output, "wb"
-        ) as out_fh:
+        with (  # pylint: disable=contextmanager-generator-missing-cleanup
+            smart_open(args.input, "rb") as in_fh,
+            smart_open(args.output, "wb") as out_fh,
+        ):
             if args.decompress:
                 with PgzipFile(
                     mode="rb",
