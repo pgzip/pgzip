@@ -597,7 +597,7 @@ class _MulitGzipReader(_GzipReader):
         if magic != b"\037\213":
             raise OSError("Not a gzipped file (%r)" % magic)
 
-        (method, flag, self._last_mtime) = struct.unpack("<BBIxx", self._read_exact(8))
+        method, flag, self._last_mtime = struct.unpack("<BBIxx", self._read_exact(8))
         if method != 8:
             raise OSError("Unknown compression method")
 
