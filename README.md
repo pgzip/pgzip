@@ -1,5 +1,3 @@
-👷👷👷 Maintainers Wanted 👷👷👷 See https://github.com/pgzip/pgzip/issues/37
-
 # pgzip
 
 [![Run tests](https://github.com/pgzip/pgzip/actions/workflows/python-tests.yml/badge.svg)](https://github.com/pgzip/pgzip/actions/workflows/python-tests.yml)
