@@ -25,6 +25,7 @@ from gzip import (
     _PaddedFile,
     write32u,
 )
+from typing import IO, Optional, Union
 
 __version__ = "0.3.5"
 
@@ -134,13 +135,13 @@ class PgzipFile(GzipFile):
 
     def __init__(
         self,
-        filename=None,
-        mode=None,
-        compresslevel=9,
-        fileobj=None,
-        mtime=None,
-        thread=None,
-        blocksize=10**8,
+        filename: Optional[Union[str, bytes, os.PathLike]] = None,
+        mode: Optional[str] = None,
+        compresslevel: int = 9,
+        fileobj: Optional[IO[bytes]] = None,
+        mtime: Optional[float] = None,
+        thread: Optional[int] = None,
+        blocksize: int = 10**8,
     ):
         """Constructor for the GzipFile class.
 
@@ -196,7 +197,7 @@ class PgzipFile(GzipFile):
         if mode.startswith("r"):
             self.mode = READ
             self.thread = self.thread // 2 or 1
-            self.raw = _MulitGzipReader(
+            self.raw = _MultiGzipReader(
                 fileobj, thread=self.thread, max_block_size=blocksize
             )
             self._buffer = io.BufferedReader(self.raw, blocksize)
@@ -315,14 +316,14 @@ class PgzipFile(GzipFile):
             return 0
         length = 0
         if force:
-            flushSize = len(self.pool_result)
+            flush_size = len(self.pool_result)
         else:
-            flushSize = len(self.pool_result) - self.thread
-        for i in range(flushSize):
+            flush_size = len(self.pool_result) - self.thread
+        for i in range(flush_size):
             cdata = self.pool_result.pop(0).result()
             length += self._write_member(cdata)
-            # (bodyBytes, resBytes, crc, oriSize) = rlt.get()
-            # compressRlt = rlt.get()
+            # (body_bytes, res_bytes, crc, ori_size) = rlt.get()
+            # compress_rlt = rlt.get()
         return length
 
     def _write_member(self, cdata):
@@ -405,12 +406,12 @@ class PgzipFile(GzipFile):
         raw_pos = self.myfileobj.tell()
         self.myfileobj.seek(0)
         while True:
-            commentByte = b""
+            comment_byte = b""
             self.myfileobj.seek(3, 1)
-            fByte = self.myfileobj.read(1)
-            if not fByte:
+            f_byte = self.myfileobj.read(1)
+            if not f_byte:
                 break
-            (flag,) = struct.unpack("<B", fByte)
+            (flag,) = struct.unpack("<B", f_byte)
             self.myfileobj.seek(8, 1)
             extra_flag = self.myfileobj.read(8)
             if not extra_flag:
@@ -428,16 +429,16 @@ class PgzipFile(GzipFile):
                     s = self.myfileobj.read(1)
                     if not s or s == b"\000":
                         break
-                    commentByte += s
+                    comment_byte += s
             if not self.index:
-                self.index.append([0, msize, 0, commentByte.decode()])
+                self.index.append([0, msize, 0, comment_byte.decode()])
             else:
                 self.index.append(
                     [
                         self.index[-1][0] + self.index[-1][1],
                         msize,
                         0,
-                        commentByte.decode(),
+                        comment_byte.decode(),
                     ]
                 )
             self.myfileobj.seek(self.index[-1][0] + self.index[-1][1] - 4)
@@ -528,11 +529,11 @@ class PgzipFile(GzipFile):
             self.fileobj.flush()
 
 
-class _MulitGzipReader(_GzipReader):
+class _MultiGzipReader(_GzipReader):
     def __init__(self, fp, thread=4, max_block_size=5 * 10**8):
         super().__init__(fp)
 
-        self.memberidx = []  # list of tuple (memberSize, rawTxtSize)
+        self.memberidx = []  # list of tuple (member_size, raw_txt_size)
         self._is_IG_member = False
         self._header_size = 0
         self.max_block_size = max_block_size
