@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 license = { text = "MIT License" }
 name = 'pgzip'
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 description = 'A multi-threading implementation of Python gzip module'
 readme = "README.md"
 authors = [
@@ -35,12 +35,14 @@ Homepage = 'https://github.com/pgzip/pgzip'
 
 [tool.hatch.envs.default]
 installer = "uv"
-dependencies = ["pytest", "pytest-cov", "pytest-xdist"]
+dependencies = ["pytest", "pytest-cov", "pytest-xdist", "tomlkit"]
 
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
 cov = "pytest --cov-report=term-missing --cov-config=pyproject.toml --cov=pgzip --cov=tests {args:tests}"
+sync-python-versions = "python scripts/supported_python_versions.py --update-pyproject"
 release = [
+  "sync-python-versions",
   "hatch run all:test",
   "hatch run lint:check",
   "hatch build",
@@ -56,7 +58,7 @@ check = ["black --check --diff {args:.}", "isort --check-only --diff {args:.}"]
 fix = ["black {args:.}", "isort {args:.}"]
 
 [[tool.hatch.envs.all.matrix]]
-python = ["3.10", "3.11", "3.12", "3.13", "3.14"]
+python = ["3.11", "3.12", "3.13", "3.14", "3.15"]
 
 [tool.hatch.envs.all]
 installer = "uv"
@@ -72,7 +74,7 @@ ignore-paths = ["tests"]
 profile = "black"
 
 [tool.black]
-target-version = ['py313']
+target-version = ['py311']
 
 [tool.flake8]
 max-line-length = 88

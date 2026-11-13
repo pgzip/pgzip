@@ -6,7 +6,7 @@
 # Using hatch and uv for environment and dependency management.
 
 .DEFAULT_GOAL := help
-.PHONY: test help install lint format cov release clean
+.PHONY: test help install lint format cov release clean clean-envs sync-python-versions
 
 _GREEN=$(shell tput setaf 2)
 _BLUE=$(shell tput setaf 4)
@@ -41,6 +41,12 @@ cov: ## Run tests with coverage report
 release: ## Run tests, linting, and build the package
 	hatch run release
 
-clean: ## Remove build artifacts and caches
+sync-python-versions: ## Update tool.hatch.envs.all.matrix in pyproject.toml
+	hatch run sync-python-versions
+
+clean-envs: ## Remove all Hatch virtual environments
+	hatch env prune
+
+clean: clean-envs ## Remove build artifacts and caches
 	rm -rf dist/ .pytest_cache/ .ruff_cache/ .mypy_cache/ htmlcov/ .coverage
 	find . -type d -name "__pycache__" -exec rm -rf {} +

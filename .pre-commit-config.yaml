@@ -10,11 +10,10 @@ repos:
 
   - repo: local
     hooks:
-      - id: hatch-lint
-        name: hatch lint
-        entry: hatch run lint:fix
+      - id: hatch-release
+        name: hatch release
+        entry: hatch run release
         language: system
-        types: [python]
         pass_filenames: false
         always_run: true
 

@@ -8,7 +8,7 @@ This project uses [Hatch](https://hatch.pypa.io/) for development environment ma
 
 ### Prerequisites
 
-- Python 3.10+
+- Python 3.11+
 - [Hatch](https://hatch.pypa.io/) (`pip install hatch`)
 
 ### Getting Started
@@ -36,15 +36,15 @@ hatch run test
 # Run tests with coverage
 hatch run cov
 
-# Test all Python versions (3.10-3.14)
+# Test all supported Python versions
 hatch run all:test
 
 # Test specific Python version
-hatch run all.py3.10:test
 hatch run all.py3.11:test
 hatch run all.py3.12:test
 hatch run all.py3.13:test
 hatch run all.py3.14:test
+hatch run all.py3.15:test
 ```
 
 ### Code Quality
