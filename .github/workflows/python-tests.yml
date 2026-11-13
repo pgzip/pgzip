@@ -5,9 +5,9 @@
 name: Run tests
 on:
   push:
-    #branches: [ master ]
+    #branches: [ main ]
   pull_request:
-    #branches: [ master ]
+    #branches: [ main ]
   schedule:
     - cron: "0 12 * * 5" # Weekly on Friday at 12:00 UTC
   workflow_dispatch:
