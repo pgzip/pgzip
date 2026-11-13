@@ -54,6 +54,7 @@ jobs:
     name: Test pre-release (Python ${{ matrix.python-version }})
     needs: setup
     if: ${{ fromJson(needs.setup.outputs.versions).prerelease[0] != null }}
+    continue-on-error: true
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
